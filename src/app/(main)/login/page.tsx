@@ -1,6 +1,8 @@
 import LoginButton from '@/components/LoginPage/SocialLogin';
 import React from 'react';
 import { Montserrat } from 'next/font/google';
+import LoginForm from '@/components/LoginPage/LoginForm';
+import Link from 'next/link';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -24,7 +26,18 @@ const LoginPage = () => {
           <p className="login_subtitle pb-20 s:text-base font-normal tracking-tight s:pb-10">
             나의 건강 목표를 쉽게 달성할 수 있습니다
           </p>
-          <LoginButton />
+          <div className="mt-8 w-full max-w-sm mx-auto">
+            <LoginForm />
+            <div className="text-center mt-4">
+              <p>
+                계정이 없으신가요?{' '}
+                <Link href="/signup" className="text-blue-500">
+                  회원가입
+                </Link>
+              </p>
+            </div>
+            <LoginButton />
+          </div>
         </div>
       </div>
     </div>
