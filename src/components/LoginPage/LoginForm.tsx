@@ -9,7 +9,7 @@ import { createClient } from '@/supabase/client';
 // Zod를 사용한 폼 검증 스키마
 const schema = z.object({
   email: z.string().email('유효한 이메일을 입력하세요').min(1, '이메일은 필수입니다'),
-  password: z.string().min(6, '비밀번호는 최소 6자 이상이어야 합니다').min(1, '비밀번호는 필수입니다')
+  password: z.string().min(4, '비밀번호는 최소 4자 이상이어야 합니다').min(1, '비밀번호는 필수입니다')
 });
 
 // Zod 스키마로부터 타입 추론
@@ -28,6 +28,8 @@ function LoginForm() {
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    console.log('로그인 시도:', data); // 로그인 시도 데이터 확인
+
     try {
       // Supabase Auth를 사용한 로그인 시도
       const { error } = await supabase.auth.signInWithPassword({
@@ -49,12 +51,12 @@ function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <label>이메일</label>
+        <label>이메일 : </label>
         <input {...register('email')} />
         <p>{errors.email?.message}</p>
       </div>
       <div>
-        <label>비밀번호</label>
+        <label>비밀번호 : </label>
         <input type="password" {...register('password')} />
         <p>{errors.password?.message}</p>
       </div>
