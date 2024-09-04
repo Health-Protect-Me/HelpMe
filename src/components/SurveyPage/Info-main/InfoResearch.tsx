@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { InformationInsertDataType, Step } from '@/types/infoReaserch';
 import { createClient } from '@/supabase/client';
 import { toast } from 'react-toastify';
@@ -21,14 +21,16 @@ const InfoResearch = (): JSX.Element => {
     gender: '',
     height: null,
     weight: null,
-    purpose: ''
+    purpose: '',
+    hasAllergy: false,
+    allergies: []
   });
 
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
 
-  const steps: Step[] = ['출생연도', '성별', '신장 및 체중', '식단 목적'];
+  const steps: Step[] = ['출생연도', '성별', '신장 및 체중', '알러지 유무', '알러지 선택', '식단 목적'];
 
   const handleClickAPICall = async () => {
     const response = await fetch('/api/gpt', {
@@ -158,7 +160,9 @@ const InfoResearch = (): JSX.Element => {
         height: surveyData.height,
         purpose: surveyData.purpose,
         result_diet: parsedResults.result_diet,
-        result_exercise: parsedResults.result_exercise
+        result_exercise: parsedResults.result_exercise,
+        has_allergy: surveyData.hasAllergy,
+        allergies: surveyData.hasAllergy ? surveyData.allergies : null
       });
 
       if (error) throw error;
@@ -199,10 +203,21 @@ const InfoResearch = (): JSX.Element => {
           surveyData.weight !== null &&
           /^\d{2,3}$/.test(surveyData.weight.toString())
         );
+      case '알러지 유무':
+        return surveyData.hasAllergy !== undefined;
+      case '알러지 선택':
+        return !surveyData.hasAllergy || (surveyData.allergies && surveyData.allergies.length > 0);
       case '식단 목적':
         return !!surveyData.purpose;
       default:
         return false;
+    }
+  };
+
+  const setCurrentStep = (step: Step) => {
+    const index = steps.indexOf(step);
+    if (index !== -1) {
+      setCurrentStepIndex(index);
     }
   };
 
@@ -213,15 +228,16 @@ const InfoResearch = (): JSX.Element => {
       ) : (
         <div className="w-full s:w-[1360px] max-w-2xl flex flex-col items-center mx-auto px-4 s:px-0">
           <h1 className="text-3xl font-bold mb-8 text-center text-gray-800 sr-only">{steps[currentStepIndex]}</h1>
-          
+
           <ProgressBar currentStep={currentStepIndex} totalSteps={steps.length} />
-          
+
           <StepRenderer
-            currentStep={steps[currentStepIndex]} 
-            surveyData={surveyData} 
-            setSurveyData={setSurveyData} 
+            currentStep={steps[currentStepIndex]}
+            surveyData={surveyData}
+            setSurveyData={setSurveyData}
+            setCurrentStep={setCurrentStep}
           />
-          
+
           <NavigationButtons
             currentStepIndex={currentStepIndex}
             setCurrentStepIndex={setCurrentStepIndex}
