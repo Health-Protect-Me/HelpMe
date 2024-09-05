@@ -81,50 +81,56 @@ const SignUpForm = () => {
 
   return (
     <div>
-      <div className="flex justify-center"></div>
-      <h2 className="text-2xl font-bold text-center text-gray-800">회원가입</h2>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="block mb-2 text-sm font-bold text-gray-700">닉네임</label>
-          <input
-            {...register('nickname')}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {errors.nickname && <p className="mt-1 text-sm text-red-500">{errors.nickname.message}</p>}
-        </div>
-        <div>
-          <label className="block mb-2 text-sm font-bold text-gray-700">이메일</label>
-          <input
-            {...register('email')}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
-        </div>
-        <div>
-          <label className="block mb-2 text-sm font-bold text-gray-700">비밀번호</label>
-          <input
-            type="password"
-            {...register('password')}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>}
-        </div>
-        <div>
-          <label className="block mb-2 text-sm font-bold text-gray-700">비밀번호 확인</label>
-          <input
-            type="password"
-            {...register('confirmPassword')}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {errors.confirmPassword && <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>}
-        </div>
-        <button
-          type="submit"
-          className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-        >
-          회원가입
-        </button>
-      </form>
+      <div className="p-8">
+        <div className="flex justify-center"></div>
+        <h2 className="mb-6 text-3xl  font-bold text-center text-gray-800">회원가입</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <label className="block mb-2 text-sm font-bold text-gray-700">Nickname</label>
+            <input
+              {...register('nickname')}
+              placeholder="nickname"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-1 focus:ring-[#FF7A85]"
+            />
+            {errors.nickname && <p className="mt-1 text-sm text-red-500">{errors.nickname.message}</p>}
+          </div>
+          <div>
+            <label className="block mb-2 text-sm font-bold text-gray-700">ID</label>
+            <input
+              {...register('email')}
+              placeholder="ID"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-1 focus:ring-[#FF7A85]"
+            />
+            {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
+          </div>
+          <div>
+            <label className="block mb-2 text-sm font-bold text-gray-700">PW</label>
+            <input
+              type="password"
+              placeholder="password"
+              {...register('password')}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-1 focus:ring-[#FF7A85]"
+            />
+            {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>}
+          </div>
+          <div>
+            <label className="block mb-2 text-sm font-bold text-gray-700">PW</label>
+            <input
+              type="password"
+              placeholder="password"
+              {...register('confirmPassword')}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-1 focus:ring-[#FF7A85]"
+            />
+            {errors.confirmPassword && <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>}
+          </div>
+          <button
+            type="submit"
+            className="w-full px-4 py-2 font-bold text-white bg-[#FF7A85] rounded-lg hover:bg-[#F5637C] focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+          >
+            회원가입
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

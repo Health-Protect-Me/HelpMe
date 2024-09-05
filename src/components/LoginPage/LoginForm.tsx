@@ -59,6 +59,7 @@ function LoginForm() {
             <label className="block mb-2 text-sm font-bold text-gray-700">ID</label>
             <input
               {...register('email')}
+              placeholder="ID"
               className="w-full px-4 font-thin py-2 border rounded-lg focus:ring-1 focus:ring-[#FF7A85]"
             />
             {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
@@ -67,6 +68,7 @@ function LoginForm() {
             <label className="block mb-2 text-sm font-bold text-gray-700">PW</label>
             <input
               type="password"
+              placeholder="password"
               {...register('password')}
               className="w-full px-4 py-2 border rounded-lg focus:ring-1 focus:ring-[#FF7A85]"
             />
