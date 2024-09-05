@@ -1,6 +1,6 @@
 import { MouseEvent } from 'react';
 
-interface ButtonProps {
+type ButtonProps = {
   buttonName: string;
   bgColor?: string;
   textColor?: string;
@@ -12,7 +12,7 @@ interface ButtonProps {
   hover?: string;
   display?: string;
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
-}
+};
 
 const Button = ({
   buttonName,

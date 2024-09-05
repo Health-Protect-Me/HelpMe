@@ -80,29 +80,52 @@ const SignUpForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <label>닉네임</label>
-        <input {...register('nickname')} />
-        {errors.nickname && <p>{errors.nickname.message}</p>}
-      </div>
-      <div>
-        <label>이메일</label>
-        <input {...register('email')} />
-        {errors.email && <p>{errors.email.message}</p>}
-      </div>
-      <div>
-        <label>비밀번호</label>
-        <input type="password" {...register('password')} />
-        {errors.password && <p>{errors.password.message}</p>}
-      </div>
-      <div>
-        <label>비밀번호 확인</label>
-        <input type="password" {...register('confirmPassword')} />
-        {errors.confirmPassword && <p>{errors.confirmPassword.message}</p>}
-      </div>
-      <button>회원가입</button>
-    </form>
+    <div>
+      <div className="flex justify-center"></div>
+      <h2 className="text-2xl font-bold text-center text-gray-800">회원가입</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label className="block mb-2 text-sm font-bold text-gray-700">닉네임</label>
+          <input
+            {...register('nickname')}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.nickname && <p className="mt-1 text-sm text-red-500">{errors.nickname.message}</p>}
+        </div>
+        <div>
+          <label className="block mb-2 text-sm font-bold text-gray-700">이메일</label>
+          <input
+            {...register('email')}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
+        </div>
+        <div>
+          <label className="block mb-2 text-sm font-bold text-gray-700">비밀번호</label>
+          <input
+            type="password"
+            {...register('password')}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>}
+        </div>
+        <div>
+          <label className="block mb-2 text-sm font-bold text-gray-700">비밀번호 확인</label>
+          <input
+            type="password"
+            {...register('confirmPassword')}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.confirmPassword && <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>}
+        </div>
+        <button
+          type="submit"
+          className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        >
+          회원가입
+        </button>
+      </form>
+    </div>
   );
 };
 
