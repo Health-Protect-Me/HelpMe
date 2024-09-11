@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useState } from 'react';
 import { InformationInsertDataType, Step } from '@/types/infoReaserch';
@@ -30,7 +30,9 @@ const InfoResearch = (): JSX.Element => {
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
 
+
   const steps: Step[] = ['출생연도', '성별', '신장 및 체중', '알러지 유무', '알러지 선택', '식단 목적'];
+
 
   const handleClickAPICall = async () => {
     const response = await fetch('/api/gpt', {
@@ -210,7 +212,7 @@ const InfoResearch = (): JSX.Element => {
     }
   };
 
-  const handleNextStep = () => {
+const handleNextStep = () => {
     if (currentStepIndex < steps.length - 1) {
       if (steps[currentStepIndex] === '알러지 유무') {
         if (surveyData.hasAllergy) {

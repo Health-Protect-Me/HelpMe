@@ -7,6 +7,8 @@ type StepRendererProps = {
   setCurrentStepIndex: React.Dispatch<React.SetStateAction<number>>;
 };
 
+
+
 const StepRenderer = ({ currentStep, surveyData, setSurveyData, setCurrentStepIndex }: StepRendererProps) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,7 +26,7 @@ const StepRenderer = ({ currentStep, surveyData, setSurveyData, setCurrentStepIn
     }
   };
 
-  const handleGenderSelect = (gender: Gender): void => {
+const handleGenderSelect = (gender: Gender): void => {
     if (!gender) return;
     setSurveyData((prevData) => ({ ...prevData, gender }));
   };
@@ -154,7 +156,7 @@ const StepRenderer = ({ currentStep, surveyData, setSurveyData, setCurrentStepIn
         </div>
       );
 
-    case '알러지 유무':
+ case '알러지 유무':
       return (
         <div className="mb-4">
           <h2 className="text-xl font-semibold mb-2 text-center text-gray-900 s:mt-20">알러지가 있으신가요?</h2>
@@ -207,7 +209,6 @@ const StepRenderer = ({ currentStep, surveyData, setSurveyData, setCurrentStepIn
           </div>
         </div>
       );
-
     case '식단 목적':
       return (
         <div className="mb-4">
