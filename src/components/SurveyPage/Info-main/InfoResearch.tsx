@@ -22,7 +22,7 @@ const InfoResearch = (): JSX.Element => {
     height: null,
     weight: null,
     purpose: '',
-    hasAllergy: false,
+    hasAllergy: null as any,
     allergies: []
   });
 
@@ -137,10 +137,6 @@ const InfoResearch = (): JSX.Element => {
       }
     });
 
-    if (exercise.method.startsWith('\n')) {
-      exercise.method = exercise.method.substring(1).trim();
-    }
-
     return exercise;
   };
 
@@ -214,10 +210,27 @@ const InfoResearch = (): JSX.Element => {
     }
   };
 
-  const setCurrentStep = (step: Step) => {
-    const index = steps.indexOf(step);
-    if (index !== -1) {
-      setCurrentStepIndex(index);
+  const handleNextStep = () => {
+    if (currentStepIndex < steps.length - 1) {
+      if (steps[currentStepIndex] === '알러지 유무') {
+        if (surveyData.hasAllergy) {
+          setCurrentStepIndex(currentStepIndex + 1); // 알러지 선택 페이지로 이동
+        } else {
+          setCurrentStepIndex(currentStepIndex + 2); // 식단 목적 페이지로 이동
+        }
+      } else {
+        setCurrentStepIndex(currentStepIndex + 1);
+      }
+    }
+  };
+
+  const handlePreviousStep = () => {
+    if (currentStepIndex > 0) {
+      if (steps[currentStepIndex] === '식단 목적' && !surveyData.hasAllergy) {
+        setCurrentStepIndex(currentStepIndex - 2); // 알러지 유무 페이지로 이동
+      } else {
+        setCurrentStepIndex(currentStepIndex - 1);
+      }
     }
   };
 
@@ -235,12 +248,13 @@ const InfoResearch = (): JSX.Element => {
             currentStep={steps[currentStepIndex]}
             surveyData={surveyData}
             setSurveyData={setSurveyData}
-            setCurrentStep={setCurrentStep}
+            setCurrentStepIndex={setCurrentStepIndex}
           />
 
           <NavigationButtons
             currentStepIndex={currentStepIndex}
-            setCurrentStepIndex={setCurrentStepIndex}
+            setCurrentStepIndex={handleNextStep}
+            handlePreviousStep={handlePreviousStep}
             totalSteps={steps.length}
             isStepValid={isStepValid}
             saveData={saveData}

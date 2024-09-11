@@ -1,14 +1,13 @@
-import React from 'react';
 import { InformationInsertDataType, Gender, DietGoal, AllergyType, Step } from '@/types/infoReaserch';
 
 type StepRendererProps = {
   currentStep: string;
   surveyData: InformationInsertDataType;
   setSurveyData: React.Dispatch<React.SetStateAction<InformationInsertDataType>>;
-  setCurrentStep: (step: Step) => void
+  setCurrentStepIndex: React.Dispatch<React.SetStateAction<number>>;
 };
 
-const StepRenderer = ({ currentStep, surveyData, setSurveyData, setCurrentStep }: StepRendererProps) => {
+const StepRenderer = ({ currentStep, surveyData, setSurveyData, setCurrentStepIndex }: StepRendererProps) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'weight' || name === 'height' || name === 'year_of_birth') {
@@ -35,9 +34,8 @@ const StepRenderer = ({ currentStep, surveyData, setSurveyData, setCurrentStep }
     setSurveyData((prevData) => ({ ...prevData, purpose }));
   };
 
-  const handleAllergyChoice = (hasAllergy: boolean): void => {
-    setSurveyData((preData) => ({ ...preData, hasAllergy }));
-    setCurrentStep(hasAllergy ? '알러지 선택' : '식단 목적');
+  const handleAllergyChoice = (hasAllergy: boolean) => {
+    setSurveyData(prevData => ({ ...prevData, hasAllergy }));
   };
 
   const handleAllergySelect = (allergy: AllergyType): void => {
@@ -155,6 +153,7 @@ const StepRenderer = ({ currentStep, surveyData, setSurveyData, setCurrentStep }
           </div>
         </div>
       );
+
     case '알러지 유무':
       return (
         <div className="mb-4">
@@ -165,13 +164,17 @@ const StepRenderer = ({ currentStep, surveyData, setSurveyData, setCurrentStep }
           <div className="flex flex-col justify-center items-center gap-4">
             <button
               onClick={() => handleAllergyChoice(true)}
-              className="w-full s:w-80 flex h-12 items-center text-center justify-center py-3 px-4 text-base border border-gray-300 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-400 transition duration-200"
+              className={`w-full s:w-80 flex h-12 items-center text-center justify-center py-3 px-4 text-base border border-gray-300 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-400 transition duration-200 ${
+                surveyData.hasAllergy === true ? 'bg-[#FFF6F2] text-black' : 'bg-white text-gray-700'
+              }`}
             >
               예
             </button>
             <button
               onClick={() => handleAllergyChoice(false)}
-              className="w-full s:w-80 flex h-12 items-center text-center justify-center py-3 px-4 text-base border border-gray-300 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-400 transition duration-200"
+              className={`w-full s:w-80 flex h-12 items-center text-center justify-center py-3 px-4 text-base border border-gray-300 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-400 transition duration-200 ${
+                surveyData.hasAllergy === false ? 'bg-[#FFF6F2] text-black' : 'bg-white text-gray-700'
+              }`}
             >
               아니오
             </button>
@@ -202,16 +205,9 @@ const StepRenderer = ({ currentStep, surveyData, setSurveyData, setCurrentStep }
               </button>
             ))}
           </div>
-          {(surveyData.allergies?.length ?? 0) > 0 && (
-            <button
-              onClick={() => setCurrentStep('식단 목적')}
-              className="mt-6 w-full s:w-80 flex h-12 items-center text-center justify-center py-3 px-4 text-base bg-[#49BA43] text-white rounded-lg hover:bg-[#3da037] focus:outline-none focus:ring-2 focus:ring-[#49BA43] transition duration-200"
-            >
-              다음
-            </button>
-          )}
         </div>
       );
+
     case '식단 목적':
       return (
         <div className="mb-4">
