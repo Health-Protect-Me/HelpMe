@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/supabase/client';
@@ -22,6 +22,15 @@ type UserData = {
   purpose: string;
 };
 
+type Exercise = {
+  type: string;
+  method: string;
+  tip: string;
+  duration: string;
+  effect: string;
+  caution: string;
+};
+
 const DynamicLoading = dynamic(() => import('@/components/LoadingPage/ResultLoading/Loading'), {
   ssr: false
 });
@@ -34,14 +43,16 @@ const useUserData = (userId: string) => {
     queryFn: async () => {
       const { data: infoData, error: infoError } = await supabase
         .from('information')
-        .select('created_at, sync_user_data, year_of_birth, weight, gender, height, purpose, user_id, result_diet, result_exercise')
+        .select(
+          'created_at, sync_user_data, year_of_birth, weight, gender, height, purpose, user_id, result_diet, result_exercise'
+        )
         .eq('user_id', userId)
         .single();
 
       if (infoError) throw infoError;
       return infoData;
     },
-    enabled: !!userId,
+    enabled: !!userId
   });
 };
 
@@ -94,7 +105,7 @@ const InforDetailPage = () => {
 
       await saveResultsToSupabase(parsedResults);
       queryClient.invalidateQueries({ queryKey: ['userData', userId] });
-    },
+    }
   });
 
   useEffect(() => {
@@ -113,7 +124,12 @@ const InforDetailPage = () => {
         const parsedDietData = JSON.parse(userData.result_diet);
         if (parsedDietData.length > 0) {
           const dayData = parsedDietData[currentDay];
-          setMeal([dayData.breakfast, dayData.lunch, dayData.dinner, { menu: '', ratio: '', calories: dayData.totalCalories }]);
+          setMeal([
+            dayData.breakfast,
+            dayData.lunch,
+            dayData.dinner,
+            { menu: '', ratio: '', calories: dayData.totalCalories }
+          ]);
         }
       }
 
@@ -181,10 +197,9 @@ const InforDetailPage = () => {
   }, []);
 
   // 운동 쪼개기
-  const parseExercise = useCallback((exerciseString: string) => {
+  const parseExercise = useCallback((exerciseString: string): Exercise | null => {
     if (!exerciseString) return null;
-    const lines = exerciseString.split('\n');
-    const exercise = {
+    const exercise: Exercise = {
       type: '',
       method: '',
       tip: '',
@@ -193,35 +208,33 @@ const InforDetailPage = () => {
       caution: ''
     };
 
+    const keyMap: Record<string, keyof Exercise> = {
+      '운동종류': 'type',
+      '운동방법': 'method',
+      '운동 팁': 'tip',
+      '운동 횟수 및 시간': 'duration',
+      '운동의 영향': 'effect',
+      '주의사항': 'caution'
+    };
+
+    const lines = exerciseString.split('\n');
     let currentKey: keyof typeof exercise | null = null;
 
     lines.forEach((line) => {
-      if (line.startsWith('운동종류:')) {
-        exercise.type = line.substring(5).trim();
-        currentKey = 'type';
-      } else if (line.startsWith('운동방법:')) {
-        exercise.method = line.substring(5).trim();
-        currentKey = 'method';
-      } else if (line.startsWith('운동 팁:')) {
-        exercise.tip = line.substring(5).trim();
-        currentKey = 'tip';
-      } else if (line.startsWith('운동 횟수 및 시간:')) {
-        exercise.duration = line.substring(11).trim();
-        currentKey = 'duration';
-      } else if (line.startsWith('운동의 영향:')) {
-        exercise.effect = line.substring(7).trim();
-        currentKey = 'effect';
-      } else if (line.startsWith('주의사항:')) {
-        exercise.caution = line.substring(5).trim();
-        currentKey = 'caution';
+      const match = line.match(/^(.+?):\s*(.*)$/);
+      if (match) {
+        const [, key, value] = match;
+        const exerciseKey = keyMap[key];
+        if (exerciseKey) {
+          exercise[exerciseKey] = value.trim();
+          currentKey = exerciseKey;
+        }
       } else if (currentKey === 'method' && line.trim() !== '') {
         exercise.method += '\n' + line.trim();
       }
     });
 
-    if (exercise.method.startsWith('\n')) {
-      exercise.method = exercise.method.substring(1).trim();
-    }
+    exercise.method = exercise.method.trim();
 
     return exercise;
   }, []);
@@ -254,7 +267,7 @@ const InforDetailPage = () => {
         purpose: userData.purpose
       });
     }
-  }
+  };
 
   // 탄단지 비율 쪼개기
   const extractRatios = (ratioString: string) => {
@@ -285,8 +298,10 @@ const InforDetailPage = () => {
         <h1 className="text-2xl text-[#27282A] font-medium mb-2 s:text-xl">오늘의 추천 식단</h1>
         <div>
           {syncUserData === false ? (
-            <div className='my-5'>
-              <p className='text-gray-800 pb-2'>프로필 정보가 변경되었어요. 새로운 목표에 맞춘 식단을 다시 받아보세요!</p>
+            <div className="my-5">
+              <p className="text-gray-800 pb-2">
+                프로필 정보가 변경되었어요. 새로운 목표에 맞춘 식단을 다시 받아보세요!
+              </p>
               <Button
                 buttonName="새로운 식단 추천받기"
                 onClick={resetGptCall}
@@ -296,8 +311,7 @@ const InforDetailPage = () => {
                 paddingY="py-2"
                 border="border-primary500"
                 buttonWidth="w-[160px] s:w-[160px]"
-              >
-              </Button>
+              ></Button>
             </div>
           ) : (
             <p className="text-gray-600 mb-6 s:text-sm">AI 분석을 바탕으로 매일 맞춤 식단을 추천해 드려요</p>
@@ -308,7 +322,9 @@ const InforDetailPage = () => {
             <Card className="!flex-[0_0_auto] shadow-floating overflow-hidden w-[400px] rounded-[20px] flex flex-col s:w-[320px]">
               <CardHeader className="!text-color-text-sub">
                 <CardDescription className="text-[#3E9B2E] font-semibold s:text-sm">아침</CardDescription>
-                <CardDescription className="text-[#27282A] text-base mt-2">{meal[0].menu.trim().replace(/^-/, '')}</CardDescription>
+                <CardDescription className="text-[#27282A] text-base mt-2">
+                  {meal[0].menu.trim().replace(/^-/, '')}
+                </CardDescription>
                 <p className="text-[#76797F] mt-1">{meal[0].calories.replace('&칼로리:', '')}</p>
               </CardHeader>
               <CardContent className="overflow-auto max-h-[200px] mt-auto">
@@ -317,33 +333,22 @@ const InforDetailPage = () => {
                     <Image
                       src={carbohydrate}
                       alt="carbohydrate"
-                      width={32} height={32}
-                      className="s:w-[24px] s:h-[24px]"
-                    />
-                    <p className='text-[#76797F] s:text-sm s:mt-2'>탄수화물</p>
-                    <p className='text-[#27282A] s:text-sm'>{breakfastRatios.carbohydrates}%</p>
-                  </div>
-                  <div className="flex flex-col items-center justify-center w-[104px] h-[104px] rounded-full bg-gray75 s:w-[88px] s:h-[88px]">
-                    <Image
-                      src={protein}
-                      alt="protein"
                       width={32}
                       height={32}
                       className="s:w-[24px] s:h-[24px]"
                     />
-                    <p className='text-[#76797F] s:text-sm s:mt-2'>단백질</p>
-                    <p className='text-[#27282A] s:text-sm'>{breakfastRatios.proteins}%</p>
+                    <p className="text-[#76797F] s:text-sm s:mt-2">탄수화물</p>
+                    <p className="text-[#27282A] s:text-sm">{breakfastRatios.carbohydrates}%</p>
                   </div>
                   <div className="flex flex-col items-center justify-center w-[104px] h-[104px] rounded-full bg-gray75 s:w-[88px] s:h-[88px]">
-                    <Image
-                      src={fat}
-                      alt="fat"
-                      width={32}
-                      height={32}
-                      className="s:w-[24px] s:h-[24px]"
-                    />
-                    <p className='text-[#76797F] s:text-sm s:mt-2'>지방</p>
-                    <p className='text-[#27282A] s:text-sm'>{breakfastRatios.fats}%</p>
+                    <Image src={protein} alt="protein" width={32} height={32} className="s:w-[24px] s:h-[24px]" />
+                    <p className="text-[#76797F] s:text-sm s:mt-2">단백질</p>
+                    <p className="text-[#27282A] s:text-sm">{breakfastRatios.proteins}%</p>
+                  </div>
+                  <div className="flex flex-col items-center justify-center w-[104px] h-[104px] rounded-full bg-gray75 s:w-[88px] s:h-[88px]">
+                    <Image src={fat} alt="fat" width={32} height={32} className="s:w-[24px] s:h-[24px]" />
+                    <p className="text-[#76797F] s:text-sm s:mt-2">지방</p>
+                    <p className="text-[#27282A] s:text-sm">{breakfastRatios.fats}%</p>
                   </div>
                 </div>
               </CardContent>
@@ -351,7 +356,9 @@ const InforDetailPage = () => {
             <Card className="!flex-[0_0_auto] shadow-floating overflow-hidden mx-1 w-[400px] s:w-[320px] rounded-[20px] flex flex-col">
               <CardHeader className="!text-color-text-sub">
                 <CardDescription className="text-[#3E9B2E] font-semibold s:text-sm">점심</CardDescription>
-                <CardDescription className="text-[#27282A] text-base mt-2">{meal[1].menu.trim().replace(/^-/, '')}</CardDescription>
+                <CardDescription className="text-[#27282A] text-base mt-2">
+                  {meal[1].menu.trim().replace(/^-/, '')}
+                </CardDescription>
                 <p className="text-[#76797F] mt-1">{meal[0].calories.replace('&칼로리:', '')}</p>
               </CardHeader>
               <CardContent className="overflow-auto max-h-[200px] mt-auto">
@@ -360,31 +367,20 @@ const InforDetailPage = () => {
                     <Image
                       src={carbohydrate}
                       alt="carbohydrate"
-                      width={32} height={32}
+                      width={32}
+                      height={32}
                       className="s:w-[24px] s:h-[24px]"
                     />
                     <p className="text-[#76797F] s:text-sm s:mt-2">탄수화물</p>
                     <p className="text-[#27282A] s:text-sm">{lunchRatios.carbohydrates}%</p>
                   </div>
                   <div className="flex flex-col items-center justify-center w-[104px] h-[104px] rounded-full bg-gray75 s:w-[88px] s:h-[88px]">
-                    <Image
-                      src={protein}
-                      alt="protein"
-                      width={32}
-                      height={32}
-                      className="s:w-[24px] s:h-[24px]"
-                    />
+                    <Image src={protein} alt="protein" width={32} height={32} className="s:w-[24px] s:h-[24px]" />
                     <p className="text-[#76797F] s:text-sm s:mt-2">단백질</p>
                     <p className="text-[#27282A] s:text-sm">{lunchRatios.proteins}%</p>
                   </div>
                   <div className="flex flex-col items-center justify-center w-[104px] h-[104px] rounded-full bg-gray75 s:w-[88px] s:h-[88px]">
-                    <Image
-                      src={fat}
-                      alt="fat"
-                      width={32}
-                      height={32}
-                      className="s:w-[24px] s:h-[24px]"
-                    />
+                    <Image src={fat} alt="fat" width={32} height={32} className="s:w-[24px] s:h-[24px]" />
                     <p className="text-[#76797F] s:text-sm s:mt-2">지방</p>
                     <p className="text-[#27282A] s:text-sm">{lunchRatios.fats}%</p>
                   </div>
@@ -394,7 +390,9 @@ const InforDetailPage = () => {
             <Card className="!flex-[0_0_auto] shadow-floating overflow-hidden w-[400px] rounded-[20px] flex flex-col s:w-[320px]">
               <CardHeader className="!text-color-text-sub">
                 <CardDescription className="text-[#3E9B2E] font-semibold s:text-sm">저녁</CardDescription>
-                <CardDescription className="text-[#27282A] text-base mt-2">{meal[2].menu.trim().replace(/^-/, '')}</CardDescription>
+                <CardDescription className="text-[#27282A] text-base mt-2">
+                  {meal[2].menu.trim().replace(/^-/, '')}
+                </CardDescription>
                 <p className="text-[#76797F] mt-1">{meal[0].calories.replace('&칼로리:', '')}</p>
               </CardHeader>
               <CardContent className="overflow-auto max-h-[200px] mt-auto">
@@ -407,30 +405,18 @@ const InforDetailPage = () => {
                       height={32}
                       className="s:w-[24px] s:h-[24px]"
                     />
-                    <p className='text-[#76797F] s:text-sm s:mt-2'>탄수화물</p>
-                    <p className='text-[#27282A] s:text-sm'>{dinnerRatios.carbohydrates}%</p>
+                    <p className="text-[#76797F] s:text-sm s:mt-2">탄수화물</p>
+                    <p className="text-[#27282A] s:text-sm">{dinnerRatios.carbohydrates}%</p>
                   </div>
                   <div className="flex flex-col items-center justify-center w-[104px] h-[104px] rounded-full bg-gray75 s:w-[88px] s:h-[88px]">
-                    <Image
-                      src={protein}
-                      alt="protein"
-                      width={32}
-                      height={32}
-                      className="s:w-[24px] s:h-[24px]"
-                    />
-                    <p className='text-[#76797F] s:text-sm s:mt-2'>단백질</p>
-                    <p className='text-[#27282A] s:text-sm'>{dinnerRatios.proteins}%</p>
+                    <Image src={protein} alt="protein" width={32} height={32} className="s:w-[24px] s:h-[24px]" />
+                    <p className="text-[#76797F] s:text-sm s:mt-2">단백질</p>
+                    <p className="text-[#27282A] s:text-sm">{dinnerRatios.proteins}%</p>
                   </div>
                   <div className="flex flex-col items-center justify-center w-[104px] h-[104px] rounded-full bg-gray75 s:w-[88px] s:h-[88px]">
-                    <Image
-                      src={fat}
-                      alt="fat"
-                      width={32}
-                      height={32}
-                      className="s:w-[24px] s:h-[24px]"
-                    />
-                    <p className='text-[#76797F] s:text-sm s:mt-2'>지방</p>
-                    <p className='text-[#27282A] s:text-sm'>{dinnerRatios.fats}%</p>
+                    <Image src={fat} alt="fat" width={32} height={32} className="s:w-[24px] s:h-[24px]" />
+                    <p className="text-[#76797F] s:text-sm s:mt-2">지방</p>
+                    <p className="text-[#27282A] s:text-sm">{dinnerRatios.fats}%</p>
                   </div>
                 </div>
               </CardContent>
@@ -453,9 +439,10 @@ const InforDetailPage = () => {
       <hr className="border-t border-gray-300 w-full" />
       <div className="w-full pt-14 s:pt-6">
         <h1 className="text-2xl text-[#27282A] font-medium mb-2 s:text-xl">오늘의 운동 플랜</h1>
-        <p className="text-gray600 mb-6 s:text-sm">목표를 더 빠르게 달성할 수 있도록 식단과 함께하면 좋은 최적의 운동이에요</p>
+        <p className="text-gray600 mb-6 s:text-sm">
+          목표를 더 빠르게 달성할 수 있도록 식단과 함께하면 좋은 최적의 운동이에요
+        </p>
         <div className="flex self-stretch w-full flex-col items-start relative flex-[0_0_auto]">
-          {/* <div className="flex w-full justify-center"> */}
           <div className="inline-flex items-center gap-2 relative flex-[0_0_auto] s:w-ful s:items-center s:justify-center">
             <div className="flex items-center mb-4 ">
               <Image src={running} alt="running" width={48} height={48} />
@@ -464,7 +451,6 @@ const InforDetailPage = () => {
           </div>
         </div>
         <div className="flex flex-col items-start gap-6 relative w-full flex-[0_0_auto] s:w-full s:items-center">
-          {/* <div className="flex flex-col items-center justify-center gap-6 w-full s:w-full s:justify-center"> */}
           <Card className="flex px-10 py-6 self-stretch w-full flex-col items-start gap-6 relative flex-[0_0_auto] bg-white rounded-[20px] shadow-floating s:w-[320px] s:p-4 s:mx-auto">
             <div className="inline-flex flex-col items-start gap-1 relative flex-[0_0_auto]">
               <div className="inline-flex items-center gap-1 relative flex-[0_0_auto]">
@@ -473,7 +459,9 @@ const InforDetailPage = () => {
               </div>
               <p className="relative w-fit text-gray800 font-desktop-p-md font-[number:var(--desktop-p-md-font-weight)] text-color-text-main-2 text-[length:var(--desktop-p-md-font-size)] tracking-[var(--desktop-p-md-letter-spacing)] leading-[var(--desktop-p-md-line-height)] [font-style:var(--desktop-p-md-font-style)]">
                 {work.method.split('\n').map((line, index) => (
-                  <div className="pt-2" key={index}>{line}</div>
+                  <div className="pt-2" key={index}>
+                    {line}
+                  </div>
                 ))}
               </p>
             </div>
