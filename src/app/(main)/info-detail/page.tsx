@@ -22,6 +22,22 @@ type UserData = {
   purpose: string;
 };
 
+type Meal = {
+  menu: string;
+  ratio: string;
+  calories: string;
+};
+
+type Diet = {
+  day: string;
+  breakfast: Meal;
+  lunch: Meal;
+  dinner: Meal;
+  totalCalories: string;
+};
+
+type MealType = 'breakfast' | 'lunch' | 'dinner';
+
 type Exercise = {
   type: string;
   method: string;
@@ -158,9 +174,9 @@ const InforDetailPage = () => {
   }, []);
 
   // 식단 쪼개기
-  const parseDiet = useCallback((dayString: string) => {
+  const parseDiet = useCallback((dayString: string): Diet => {
     const sections = dayString.split('\n');
-    const diet = {
+    const diet: Diet = {
       day: '',
       breakfast: { menu: '', ratio: '', calories: '' },
       lunch: { menu: '', ratio: '', calories: '' },
@@ -168,29 +184,28 @@ const InforDetailPage = () => {
       totalCalories: ''
     };
 
-    let currentMeal = null;
+    const mealSymbols: { [key: string]: MealType } = {
+      '#': 'breakfast',
+      '^': 'lunch',
+      '!': 'dinner'
+    };
 
-    sections.forEach((line) => {
+    const parseMeal = (line: string, mealType: MealType): void => {
+      const meal = diet[mealType];
+      const symbol = line[0];
+      if (line.startsWith(`${symbol}?메뉴:`)) meal.menu += line.substring(7).trim() + '\n';
+      else if (line.startsWith(`${symbol}-`)) meal.menu += line.substring(1).trim() + '\n';
+      else if (line.startsWith(`${symbol}$`)) meal.ratio = line.substring(1).trim();
+      else if (line.startsWith(`${symbol}&`)) meal.calories = line.substring(1).trim();
+    };
+
+    sections.forEach((line: string) => {
       if (line.startsWith('@')) diet.day = line.substring(1).trim();
-      else if (line.startsWith('#')) {
-        currentMeal = diet.breakfast;
-        if (line.startsWith('#?메뉴:')) currentMeal.menu += line.substring(7).trim() + '\n';
-        else if (line.startsWith('#-')) currentMeal.menu += line.substring(1).trim() + '\n';
-        else if (line.startsWith('#$')) currentMeal.ratio = line.substring(1).trim();
-        else if (line.startsWith('#&')) currentMeal.calories = line.substring(1).trim();
-      } else if (line.startsWith('^')) {
-        currentMeal = diet.lunch;
-        if (line.startsWith('^?메뉴:')) currentMeal.menu += line.substring(7).trim() + '\n';
-        else if (line.startsWith('^-')) currentMeal.menu += line.substring(1).trim() + '\n';
-        else if (line.startsWith('^$')) currentMeal.ratio = line.substring(1).trim();
-        else if (line.startsWith('^&')) currentMeal.calories = line.substring(1).trim();
-      } else if (line.startsWith('!')) {
-        currentMeal = diet.dinner;
-        if (line.startsWith('!?메뉴:')) currentMeal.menu += line.substring(7).trim() + '\n';
-        else if (line.startsWith('!-')) currentMeal.menu += line.substring(1).trim() + '\n';
-        else if (line.startsWith('!$')) currentMeal.ratio = line.substring(1).trim();
-        else if (line.startsWith('!&')) currentMeal.calories = line.substring(1).trim();
-      } else if (line.startsWith('*')) diet.totalCalories = line.substring(1).trim();
+      else if (line.startsWith('*')) diet.totalCalories = line.substring(1).trim();
+      else {
+        const mealType = mealSymbols[line[0]];
+        if (mealType) parseMeal(line, mealType);
+      }
     });
 
     return diet;
