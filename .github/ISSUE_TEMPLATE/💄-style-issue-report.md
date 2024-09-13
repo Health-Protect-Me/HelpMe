@@ -9,10 +9,8 @@ assignees: ''
 
 ---
 name: 'CSS'
-about: 코드의 구조나 디자인을 변경하되 기능은 그대로 유지
+about:  디자인을 변경
 title: '[CSS] '
-labels: ''
-assignees: ''
 ---
 ## Description
 ### 어떤 스타일을 작업 또는 수정했는지 작성해주세요.

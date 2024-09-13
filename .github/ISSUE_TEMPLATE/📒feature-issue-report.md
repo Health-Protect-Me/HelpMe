@@ -1,19 +1,17 @@
 ---
-name: '📒FEATURE'
+name: "\U0001F4D2FEATURE"
 about: 새로운 기능 추가 시 사용하는 템플릿입니다.
-title: '[FEATURE] '
+title: "[FEATURE] "
 labels: ''
 assignees: ''
+
 ---
 
 ---
 
 name: 'FEAT'
-about: 코드의 구조나 디자인을 변경하되 기능은 그대로 유지
+about: 코드의 구조나 디자인 새로 추가
 title: '[FEAT] '
-labels: ''
-assignees: ''
-
 ---
 
 ## Description

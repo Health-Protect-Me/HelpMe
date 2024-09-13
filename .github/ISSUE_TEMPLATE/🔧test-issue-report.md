@@ -9,13 +9,12 @@ assignees: ''
 
 ---
 name: 'TEST'
-about: 코드의 구조나 디자인을 변경하되 기능은 그대로 유지
+about: 코드의 구조나 디자인 테스트
 title: '[TEST] '
-labels: ''
-assignees: ''
 ---
 ## Description
-### 어떤 파일 또는 코드를 옮기고 정리했는지 작성해주세요.
+### 어떤 파일 또는 코드를 테스트 했는지 작성해주세요.
+
 ## To-Do
 -   [ ] todo1
 -   [ ] todo2

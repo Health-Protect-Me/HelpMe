@@ -9,13 +9,12 @@ assignees: ''
 
 ---
 name: 'BUG'
-about: 코드의 구조나 디자인을 변경하되 기능은 그대로 유지
+about: 코드의 구조나 디자인에서 버그가 발견
 title: '[BUG] '
-labels: ''
-assignees: ''
 ---
 ## Description
 ### 어떤 코드가 버그가 발생했는지 작성해주세요.
+
 ## To-Do
 -   [ ] todo1
 -   [ ] todo2
