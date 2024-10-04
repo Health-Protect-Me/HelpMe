@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { InformationInsertDataType, Step } from '@/types/infoReaserch';
 import { createClient } from '@/supabase/client';
 import { toast } from 'react-toastify';
@@ -21,14 +21,18 @@ const InfoResearch = (): JSX.Element => {
     gender: '',
     height: null,
     weight: null,
-    purpose: ''
+    purpose: '',
+    hasAllergy: null as any,
+    allergies: []
   });
 
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
 
-  const steps: Step[] = ['출생연도', '성별', '신장 및 체중', '식단 목적'];
+
+  const steps: Step[] = ['출생연도', '성별', '신장 및 체중', '알러지 유무', '알러지 선택', '식단 목적'];
+
 
   const handleClickAPICall = async () => {
     const response = await fetch('/api/gpt', {
@@ -135,10 +139,6 @@ const InfoResearch = (): JSX.Element => {
       }
     });
 
-    if (exercise.method.startsWith('\n')) {
-      exercise.method = exercise.method.substring(1).trim();
-    }
-
     return exercise;
   };
 
@@ -158,7 +158,9 @@ const InfoResearch = (): JSX.Element => {
         height: surveyData.height,
         purpose: surveyData.purpose,
         result_diet: parsedResults.result_diet,
-        result_exercise: parsedResults.result_exercise
+        result_exercise: parsedResults.result_exercise,
+        has_allergy: surveyData.hasAllergy,
+        allergies: surveyData.hasAllergy ? surveyData.allergies : null
       });
 
       if (error) throw error;
@@ -199,10 +201,38 @@ const InfoResearch = (): JSX.Element => {
           surveyData.weight !== null &&
           /^\d{2,3}$/.test(surveyData.weight.toString())
         );
+      case '알러지 유무':
+        return surveyData.hasAllergy !== undefined;
+      case '알러지 선택':
+        return !surveyData.hasAllergy || (surveyData.allergies && surveyData.allergies.length > 0);
       case '식단 목적':
         return !!surveyData.purpose;
       default:
         return false;
+    }
+  };
+
+const handleNextStep = () => {
+    if (currentStepIndex < steps.length - 1) {
+      if (steps[currentStepIndex] === '알러지 유무') {
+        if (surveyData.hasAllergy) {
+          setCurrentStepIndex(currentStepIndex + 1); // 알러지 선택 페이지로 이동
+        } else {
+          setCurrentStepIndex(currentStepIndex + 2); // 식단 목적 페이지로 이동
+        }
+      } else {
+        setCurrentStepIndex(currentStepIndex + 1);
+      }
+    }
+  };
+
+  const handlePreviousStep = () => {
+    if (currentStepIndex > 0) {
+      if (steps[currentStepIndex] === '식단 목적' && !surveyData.hasAllergy) {
+        setCurrentStepIndex(currentStepIndex - 2); // 알러지 유무 페이지로 이동
+      } else {
+        setCurrentStepIndex(currentStepIndex - 1);
+      }
     }
   };
 
@@ -213,18 +243,20 @@ const InfoResearch = (): JSX.Element => {
       ) : (
         <div className="w-full s:w-[1360px] max-w-2xl flex flex-col items-center mx-auto px-4 s:px-0">
           <h1 className="text-3xl font-bold mb-8 text-center text-gray-800 sr-only">{steps[currentStepIndex]}</h1>
-          
+
           <ProgressBar currentStep={currentStepIndex} totalSteps={steps.length} />
-          
+
           <StepRenderer
-            currentStep={steps[currentStepIndex]} 
-            surveyData={surveyData} 
-            setSurveyData={setSurveyData} 
+            currentStep={steps[currentStepIndex]}
+            surveyData={surveyData}
+            setSurveyData={setSurveyData}
+            setCurrentStepIndex={setCurrentStepIndex}
           />
-          
+
           <NavigationButtons
             currentStepIndex={currentStepIndex}
-            setCurrentStepIndex={setCurrentStepIndex}
+            setCurrentStepIndex={handleNextStep}
+            handlePreviousStep={handlePreviousStep}
             totalSteps={steps.length}
             isStepValid={isStepValid}
             saveData={saveData}
